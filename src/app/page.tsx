@@ -1,17 +1,11 @@
 import { Suspense } from 'react';
+import { PrismaClient } from '@prisma/client';
 
-type Item = {
-  id: number;
-  name: string;
-  category: string;
-};
+const prisma = new PrismaClient();
 
-async function getItems(): Promise<Item[]> {
-  const res = await fetch('http://localhost:3000/api/items', {
-    cache: 'no-store'
-  });
-  if (!res.ok) throw new Error('Failed to fetch data');
-  return res.json();
+async function getItems() {
+  const items = await prisma.item.findMany();
+  return items;
 }
 
 const getCategoryColor = (category: string) => {
@@ -51,11 +45,6 @@ async function DataList() {
             <span className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${getCategoryColor(item.category)}`}>
               {item.category}
             </span>
-            <button className="text-slate-400 group-hover:text-indigo-500 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            </button>
           </div>
         </div>
       ))}
@@ -75,14 +64,6 @@ export default function Home() {
             <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight">
               Inventory <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-cyan-500">Overview</span>
             </h1>
-            <p className="mt-3 text-slate-500 text-lg max-w-xl">
-              Manage and track all your products directly fetched from the SQLite database.
-            </p>
-          </div>
-          
-          <div className="inline-flex items-center px-4 py-2 bg-white border border-slate-200 rounded-xl shadow-sm text-sm font-medium text-slate-600">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
-            Live Data
           </div>
         </div>
 
@@ -93,7 +74,6 @@ export default function Home() {
                 <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm h-40 animate-pulse">
                   <div className="h-6 bg-slate-200 rounded w-3/4 mb-4"></div>
                   <div className="h-4 bg-slate-100 rounded w-1/4 mb-8"></div>
-                  <div className="h-8 bg-slate-100 rounded w-1/3 mt-auto"></div>
                 </div>
               ))}
             </div>
